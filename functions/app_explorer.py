@@ -218,14 +218,35 @@ async def get_modules(app, session, pid, device):
 				st.dataframe(df,use_container_width=True, height=600)
 				# st.write(module_detail['symbols'])
 
-
+async def get_files(app, session, pid, device):
+    with st.container(height=900):
+        file_names_script = session.create_script(open("scripts/files.js").read())
+        file_names_script.on("message", on_message)
+        await asyncio.to_thread(file_names_script.load)
+        file_names = await file_names_script.exports_async.list_app_files()
+        file_names['base_path'] = file_names['']
+        file_names.pop('')
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            selected_folder = st.selectbox(f"Select a folder:", options=file_names.keys(), index=None)
+        
+        with col2:
+            selected_file = st.selectbox(f"Select a file:", options=file_names[selected_folder], index=None)
+        if selected_file and selected_folder:
+            file_detail_script = session.create_script(open("scripts/get_file_content.js").read())
+            file_detail_script.on("message", on_message)
+            await asyncio.to_thread(file_detail_script.load)
+            file_detail = await file_detail_script.exports_async.read_file_contents(selected_folder, selected_file)
+            file_detail_script.unload()
+            st.write(file_detail)
 	
 # Main function to handle app exploration
 async def explore_app(app_identifier, device):
     session, app, pid = await get_session(app_identifier, device)
 
     # Create tabs and run their respective functions concurrently
-    basic, storage_comp, script_loader, modules, classes = st.tabs(["Basic Info", "Storage", "Script Loader", "Modules", "Classes"])
+    basic, storage_comp, files, script_loader, modules, classes = st.tabs(["Basic Info", "Storage", "Files","Script Loader", "Modules", "Classes"])
     
     css = '''
     <style>
@@ -240,6 +261,8 @@ async def explore_app(app_identifier, device):
         await basic_info(app, session, pid, device)
     with script_loader:
         await run_script_loader(app, session, pid, device)
+    with files:
+        await get_files(app, session, pid, device)
     with storage_comp:
         await storage_func(app, session, pid, device)
     with classes:

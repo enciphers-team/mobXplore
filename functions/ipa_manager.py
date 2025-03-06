@@ -111,7 +111,7 @@ def ipa_manager():
     
     st.markdown(
     f"""
-    <h1 style='text-align: center;'>IPA Manager</h1>
+    <h1 style='text-align: center;'>IPA Extractor</h1>
     
     """,unsafe_allow_html=True)
     try:
@@ -138,12 +138,6 @@ def ipa_manager():
                 port = st.text_input("Port", placeholder="Enter Port", value=22)
             if st.button("Extract IPA"):
                 extract_ipa(selected_app,ip_address,username,port,password,device)
-
-        with st.expander("Sideload IPA",expanded=True):
-            uploaded_file = st.file_uploader("Upload an IPA file to sideload", type=["ipa"])
-            if uploaded_file and st.button("Sideload IPA"):
-                st.write(f"Sideloading IPA: {uploaded_file.name}...")
-                st.success(f"IPA {uploaded_file.name} sideloaded successfully.")
     except Exception as e:
         st.error(f"Error: {e}")
 
