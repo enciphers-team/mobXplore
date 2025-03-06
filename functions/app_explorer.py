@@ -65,7 +65,6 @@ async def basic_info(app, session, pid, device):
     with st.container(border=True, height=650):
         # Fetch Info.plist details asynchronously
         info_plist = await get_info_plist_async(session)
-
         # Update UI with fetched information
         st.markdown(f"**Bundle Path**: `{info_plist['bundlePath']}`")
         st.markdown(f"**Info.plist Path**: `{info_plist['infoPlistPath']}`")
