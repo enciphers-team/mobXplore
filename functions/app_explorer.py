@@ -226,7 +226,7 @@ async def get_files(app, session, pid, device):
         file_names['base_path'] = file_names['']
         file_names.pop('')
         col1, col2 = st.columns(2)
-        
+        selected_folder, selected_file = (None, None)
         with col1:
             selected_folder = st.selectbox(f"Select a folder:", options=file_names.keys(), index=None)
         

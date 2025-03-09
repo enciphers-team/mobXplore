@@ -1,10 +1,10 @@
 import streamlit as st
 import asyncio
 # Import functions from the 'functions' folder
-from functions import home, device_info, app_manager, ipa_manager, remote_device
+from functions import home, device_info, app_manager, ipa_manager, remote_device, quick_scan
 from functions.app_explorer import explore_app
 from PIL import Image
-favicon = Image.open("favicon.ico")
+favicon = Image.open("logo.png")
 st.set_page_config(page_title="MobXplore",layout="wide",page_icon=favicon)
 st.markdown(
     """
@@ -48,7 +48,7 @@ def navigate_to(page):
     st.session_state['current_page'] = page
 
 def navigation():
-    st.sidebar.image('mobxplore.png')
+    st.sidebar.image('logo.png',caption="By The Creators Of Mobexler")
     # st.sidebar.title("GiPT Navigation")
 
     # Define buttons for each page, set the state for each page when clicked
@@ -62,8 +62,10 @@ def navigation():
         navigate_to('device_info')
     if st.sidebar.button("App Explorer"):
         navigate_to('app_manager')
-    if st.sidebar.button("IPA Manager"):
+    if st.sidebar.button("IPA Extractor"):
         navigate_to('ipa_manager')
+    if st.sidebar.button("Quick Security Scan"):
+        navigate_to('security_scan')
 
     # Check session state for current page
     if st.session_state['current_page'] == 'home':
@@ -76,6 +78,8 @@ def navigation():
         ipa_manager.ipa_manager()
     elif st.session_state['current_page'] == 'explore_app':
         asyncio.run(explore_app(st.session_state.get('app_identifier', None), st.session_state.get('device')))
+    elif st.session_state['current_page'] == 'security_scan':
+        quick_scan.scanner_main(st.session_state.get('device'))
     else:
         # Default to home page if session state is corrupted
         home.home_page()
