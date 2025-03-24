@@ -229,9 +229,9 @@ async def get_files(app, session, pid, device):
         selected_folder, selected_file = (None, None)
         with col1:
             selected_folder = st.selectbox(f"Select a folder:", options=file_names.keys(), index=None)
-        
-        with col2:
-            selected_file = st.selectbox(f"Select a file:", options=file_names[selected_folder], index=None)
+        if selected_folder:
+            with col2:
+                selected_file = st.selectbox(f"Select a file:", options=file_names[selected_folder], index=None)
         if selected_file and selected_folder:
             file_detail_script = session.create_script(open("scripts/get_file_content.js").read())
             file_detail_script.on("message", on_message)

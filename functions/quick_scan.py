@@ -16,17 +16,23 @@ def scanner_main(device):
             device = frida.get_usb_device()
         installed_apps = device.enumerate_applications()
         app_names = [(app.name, app.identifier) for app in installed_apps]
-        selected_app = st.selectbox("Select an app to scan", app_names)
-        app = device.enumerate_applications(identifiers=[selected_app[1]], scope="full")[0]
-        pid = app.pid if app.pid else device.spawn(app.identifier)
-        device.resume(pid)
-        session = device.attach(pid)
-        device.resume(pid)
-        stay_awake_script = open("scripts/stay_awake.js").read()
-        stay_awake = session.create_script(stay_awake_script)
-        stay_awake.on("message", on_message)
-        stay_awake.load()
-        asyncio.run(perform_scan(session, app))
+        col1, col2 = st.columns([4,1])
+        with col1:
+            selected_app = st.selectbox("Select an app to start scan", app_names, index=None)
+        with col2:
+            st.write("")
+            scan = st.button("Scan")
+        if scan and selected_app:
+            app = device.enumerate_applications(identifiers=[selected_app[1]], scope="full")[0]
+            pid = app.pid if app.pid else device.spawn(app.identifier)
+            device.resume(pid)
+            session = device.attach(pid)
+            device.resume(pid)
+            stay_awake_script = open("scripts/stay_awake.js").read()
+            stay_awake = session.create_script(stay_awake_script)
+            stay_awake.on("message", on_message)
+            stay_awake.load()
+            asyncio.run(perform_scan(session, app))
         
     except Exception as e:
         st.error(f"Error: {e}")
